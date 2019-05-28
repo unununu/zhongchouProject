@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" id="WebApp_ID" version="2.5">
+
+	<!-- spring配置文件位置：下面的监听器会在这里取 -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>classpath*:spring/spring-*.xml</param-value><!-- classpath* :有*表示其他jar包里有这个文件路径的也算的，没有*就表加载当前项目没有其他项目模块的要加载 -->
+    </context-param>
+    
+    <!-- 监听器：加载spring配置文件创建spring容器 存到servletContext里-->
+    <!-- 通过工具类可获取容器：WebApplicationContext.getWebApplicationContext(context) -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+	<!-- 自定义监听器：将上下文根路径放入servletcontext域方便使用 -->
+	<listener>
+		<listener-class>com.hehuiming.zc.listner.StartAppListner</listener-class>
+	</listener>
+    <!-- 字符编码过滤器：只解决post请求 -->
+    <!-- 开发一个过滤器：
+    	1.实现filter接口：里面有3个方法：
+    	init:服务器开启时执行一次（服务器传入的参数可以获取web.xml中配置filter的参数），
+    	destory:关闭服务器或卸载项目的时候执行一次，
+    	dochain:匹配到具体url就会调用该方法
+    	
+    	2.看源码：这里具体是设置了request 与response 里的编码
+    	3.多个过滤器的执行顺序：路径匹配越精确越优先
+    
+     -->
+    <filter>
+        <filter-name>encoding</filter-name>
+        <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+        <init-param>
+            <param-name>encoding</param-name>
+            <param-value>UTF-8</param-value>
+        </init-param>
+        <init-param>
+            <param-name>forceEncoding</param-name>
+            <param-value>true</param-value>
+        </init-param>
+    </filter>
+    <filter-mapping>
+        <filter-name>encoding</filter-name>
+        <url-pattern>/*</url-pattern>
+        <!-- 默认情况过滤器是：只过滤请求不过滤内部转发的，可以两个一起配置则内部转发也会经过过滤器 -->
+        <dispatcher>FORWARD</dispatcher>
+        <dispatcher>REQUEST</dispatcher><!-- 默认只有这个 -->
+    </filter-mapping>
+
+	    <!-- 该过滤器：用于支持restful风格 -->
+	    <!-- 根据_method 参数将post分成delect,put方法 -->
+	<filter>  
+	    <filter-name>HiddenHttpMethodFilter</filter-name>  
+	    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>  
+	</filter>
+	<filter-mapping>  
+	    <filter-name>HiddenHttpMethodFilter</filter-name>  
+	    <servlet-name>springmvc</servlet-name>  <!-- 这里配置的表下面名为springmvc的servlet执行前执行此过滤器 -->
+	</filter-mapping> 
+    
+
+    
+    <servlet>
+        <servlet-name>springmvc</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+        <init-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>classpath:spring/springmvc-context.xml</param-value>
+        </init-param>
+        <load-on-startup>1</load-on-startup><!-- servlet创建时间：一加载文件就创建非第一次访问才创建 大于等于0，都设置该标签的话，越小越先创建 -->
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>springmvc</servlet-name>
+        <url-pattern>*.htm</url-pattern> <!-- /* 表根目录下所有;   / 表 默认 ；这里设置了后缀名匹配那么关于静态文件就会全部走默认路径servlet（tomcat自有），便不用再做静态文件的匹配了 -->
+        <url-pattern>*.do</url-pattern>	<!-- 走数据库的.do 不走的htm -->
+    </servlet-mapping>
+    
+    <!-- 会话超时时间 -->
+    <session-config>
+        <session-timeout>60</session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+    </welcome-file-list>
+</web-app>

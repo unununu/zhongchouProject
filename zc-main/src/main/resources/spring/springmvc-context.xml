@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+
+    <!-- 启用注解功能 -->
+    <context:annotation-config />
+    
+    <!-- 字符串字符编码转换：json数据的 -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter" >
+        <property name="messageConverters">   
+	         <list>
+	             <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">   
+	                <property name="supportedMediaTypes">
+	                      <list>
+	                          <value>application/json;charset=UTF-8</value>
+	                     </list>   
+	                </property>   
+	             </bean>   
+	         </list>   
+	    </property>
+    </bean>
+    
+    <!-- 包扫描 -->
+    <context:component-scan base-package="com.hehuiming.zc.*" use-default-filters="false"><!-- 不使用默认的所有注解都生成组件的 -->
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/><!-- 只要controller的 -->
+    </context:component-scan>
+	
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+        <property name="prefix" value="/WEB-INF/jsp/"></property>
+        <property name="suffix" value=".jsp"></property>
+    </bean>
+     
+    <!-- 简单异常解析器：跳转页面并将异常错误放入request域中参数名exception -->
+    <bean id="exceptionResolver"  
+        class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
+        <property name="exceptionMappings">  
+            <props>
+                <prop key="java.lang.Exception">error/error</prop><!-- 这里的error/error会被上面的内部视图解析器解析加前后缀 --> <!-- 中文乱码未解决登良路失败跳转到login页面 -->
+                <prop key="com.hehuiming.zc.exception.WrongUserException">redirect:/login.htm?exMessage=username or password was wrong</prop>
+            </props>  
+        </property>  
+    </bean>
+
+	<!-- 上传文件的大小 文本编码 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="UTF-8">
+        <property name="maxUploadSize" value="2097152"/>
+        <property name="resolveLazily" value="true"/><!-- 先计算大小再看要不要上传 -->
+    </bean>
+</beans>
