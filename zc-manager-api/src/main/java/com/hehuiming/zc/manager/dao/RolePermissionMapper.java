@@ -13,4 +13,9 @@ public interface RolePermissionMapper {
     List<RolePermission> selectAll();
 
     int updateByPrimaryKey(RolePermission record);
+
+    /*
+     * 根据roleidc查询permissionIds
+     */
+	List<Integer> selectPermissionsIdByRoleId(Integer roleId);
 }

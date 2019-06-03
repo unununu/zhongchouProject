@@ -27,4 +27,14 @@
     select id, name
     from t_role
   </select>
+  
+  <select id="selectCount" resultType="int">
+    select count(*)
+    from t_role
+  </select>
+  
+   
+  <select id="selectLimit" resultMap="BaseResultMap">
+    select id, name from t_role LIMIT #{begin} , #{size}
+  </select>
 </mapper>

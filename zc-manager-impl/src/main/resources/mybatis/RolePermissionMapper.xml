@@ -31,4 +31,8 @@
     select id, roleid, permissionid
     from t_role_permission
   </select>
+  
+  <select id="selectPermissionsIdByRoleId" resultType ="int">
+    select  permissionid from t_role_permission where roleid = #{roleid}
+  </select>
 </mapper>

@@ -16,8 +16,9 @@ public class Permission {
     
     //用于建立前端z-tree的结构，open:节点是否默认打开/关闭
     private boolean open = true;
-    
-    
+    //用于建立前端z-tree的结构，checked:有复选框时默认false不选
+    private boolean checked = false;
+	
 	//用于建立前端z-tree的结构:直接的子节点
     private List<Permission> children = new ArrayList<>();
     
@@ -63,6 +64,15 @@ public class Permission {
     public void setName(String name) {
         this.name = name == null ? null : name.trim();
     }
+    
+    public boolean isChecked() {
+		return checked;
+	}
+
+	public void setChecked(boolean checked) {
+		this.checked = checked;
+	}
+
 
     public String getIcon() {
         return icon;
@@ -71,6 +81,7 @@ public class Permission {
     public void setIcon(String icon) {
         this.icon = icon == null ? null : icon.trim();
     }
+    
 
     public String getUrl() {
         return url;
